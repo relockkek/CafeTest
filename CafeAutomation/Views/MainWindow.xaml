@@ -1,0 +1,61 @@
+﻿<Window x:Class="CafeAutomation.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Кафе Автоматизация" Height="600" Width="1000"
+        WindowState="Maximized"
+        ResizeMode="CanResize"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <!-- Стиль кнопок бокового меню -->
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#007ACC"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10 5"/>
+            <Setter Property="Margin" Value="0,5"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Боковое меню -->
+        <!-- Боковое меню -->
+        <Border Background="#2D2D30" Grid.Column="0" Padding="10">
+            <StackPanel>
+
+                <TextBlock Text="Sigmo еда" Foreground="White" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/>
+
+                <Button Content="Главная" Click="Home_Click"/>
+                <Button Content="Меню" Click="Menu_Click"/>
+                <Button Content="Заказы" Click="Orders_Click"/>
+                <Button Content="Бронирование" Click="Reservations_Click"/>
+                <Button Content="Сотрудники" Click="Employees_Click"/>
+                <Button Content="Выход" Click="Exit_Click" Margin="0,20,0,0"/>
+            </StackPanel>
+        </Border>
+
+
+        <!-- Контейнер для страниц -->
+        <Frame x:Name="MainFrame" Grid.Column="1" NavigationUIVisibility="Hidden"/>
+    </Grid>
+</Window>
