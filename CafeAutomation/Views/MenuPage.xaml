@@ -4,7 +4,16 @@
       xmlns:vm="clr-namespace:CafeAutomation.ViewModels"
       Title="Меню">
 
-    <!-- DataContext теперь устанавливается только в C# -->
+    <Page.DataContext>
+        <vm:DishesMVVM />
+    </Page.DataContext>
+
+    <Page.Resources>
+        <DropShadowEffect x:Key="DropShadowEffect"
+                          BlurRadius="8"
+                          ShadowDepth="2"
+                          Opacity="0.2"/>
+    </Page.Resources>
 
     <Grid Margin="40">
         <Grid.RowDefinitions>
@@ -12,48 +21,55 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <!-- Заголовок -->
         <TextBlock Grid.Row="0"
                    Text="Управление меню"
                    FontSize="36"
                    FontWeight="Bold"
-                   Foreground="{StaticResource TextBrush}"
+                   Foreground="Black"
                    HorizontalAlignment="Center"
                    Margin="0,0,0,40"/>
 
+        <!-- Категории -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding Categories}"
-                          HorizontalContentAlignment="Center">
+            <ItemsControl ItemsSource="{Binding Categories}" HorizontalAlignment="Center">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel Orientation="Horizontal"
                                    HorizontalAlignment="Center"
-                                   MaxWidth="1200"/>
+                                   MaxWidth="1300"
+                                   ItemWidth="320"
+                                   ItemHeight="370"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
 
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Button Width="200" Height="220"
-                                Margin="15"
-                                Tag="{Binding Name}"
-                                Click="Category_Click"
-                                Cursor="Hand"
-                                Background="White"
-                                BorderBrush="#DDD"
-                                BorderThickness="1">
-                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <Image Source="{Binding ImagePath}"
-                                       Width="80" Height="80"
-                                       Margin="0,10"
-                                       Stretch="Uniform"/>
-                                <TextBlock Text="{Binding Name}"
-                                           FontSize="16"
-                                           FontWeight="SemiBold"
-                                           TextAlignment="Center"
-                                           TextWrapping="Wrap"
-                                           Margin="0,10,0,0"/>
-                            </StackPanel>
-                        </Button>
+                        <StackPanel Margin="10" HorizontalAlignment="Center">
+                            <Button Width="300" Height="300"
+                                    Tag="{Binding Name}"
+                                    Click="Category_Click"
+                                    Cursor="Hand"
+                                    BorderThickness="0"
+                                    Padding="0"
+                                    Background="Transparent">
+                                <Border CornerRadius="16"
+                                        ClipToBounds="True"
+                                        Effect="{StaticResource DropShadowEffect}">
+                                    <Image Source="{Binding ImagePath}"
+                                           Stretch="UniformToFill"
+                                           HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Stretch"/>
+                                </Border>
+                            </Button>
+
+                            <!-- Название категории -->
+                            <TextBlock Text="{Binding Name}"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,10,0,0"/>
+                        </StackPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

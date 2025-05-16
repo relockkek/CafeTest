@@ -44,16 +44,33 @@ namespace CafeAutomation.Views
 
         private void SelectImage_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new OpenFileDialog
-            {
-                Filter = "Изображения (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg"
-            };
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "Изображения (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg";
 
             if (dialog.ShowDialog() == true)
             {
-                selectedImageBytes = File.ReadAllBytes(dialog.FileName);
-                PreviewImage.Source = new BitmapImage(new System.Uri(dialog.FileName));
+                var resized = ResizeAndCompressImage(dialog.FileName, 200, 200, 0.7); // 70% качество
+                ResultDish.ImageData = resized;
             }
+        }
+        private byte[] ResizeAndCompressImage(string filePath, int maxWidth, int maxHeight, double quality)
+        {
+            BitmapImage original = new BitmapImage();
+            original.BeginInit();
+            original.UriSource = new Uri(filePath);
+            original.DecodePixelWidth = maxWidth;
+            original.DecodePixelHeight = maxHeight;
+            original.CacheOption = BitmapCacheOption.OnLoad;
+            original.EndInit();
+            original.Freeze();
+
+            var encoder = new JpegBitmapEncoder();
+            encoder.QualityLevel = (int)(quality * 100);
+            encoder.Frames.Add(BitmapFrame.Create(original));
+
+            using var stream = new MemoryStream();
+            encoder.Save(stream);
+            return stream.ToArray();
         }
 
         private void OK_Click(object sender, RoutedEventArgs e)

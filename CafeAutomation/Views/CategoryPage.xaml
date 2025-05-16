@@ -14,6 +14,7 @@
     </Page.Resources>
 
     <DockPanel LastChildFill="True" Margin="40">
+
         <!-- Кнопка снизу -->
         <StackPanel DockPanel.Dock="Bottom"
                     Orientation="Horizontal"
@@ -74,30 +75,52 @@
                           HorizontalAlignment="Left"
                           VerticalAlignment="Top"
                           Margin="0">
+
                     <DataGrid.Columns>
-                        <!-- Название: фиксированная ширина -->
-                        <DataGridTextColumn Header="Название"
-                                            Binding="{Binding Name}"
-                                            Width="200"/>
+                        <!-- Название -->
+                        <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="180">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                    <Setter Property="ToolTip" Value="{Binding Name}"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                                    <Setter Property="Padding" Value="4,0,4,0"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
 
                         <!-- Цена -->
-                        <DataGridTextColumn Header="Цена"
-                                            Binding="{Binding Price}"
-                                            Width="100"/>
+                        <DataGridTextColumn Header="Цена" Binding="{Binding Price}" Width="80">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="TextAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
 
                         <!-- Категория -->
-                        <DataGridTextColumn Header="Категория"
-                                            Binding="{Binding Category}"
-                                            Width="150"/>
+                        <DataGridTextColumn Header="Категория" Binding="{Binding Category}" Width="120">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="TextAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
 
                         <!-- Описание -->
-                        <DataGridTextColumn Header="Описание"
-                                            Binding="{Binding Description}"
-                                            Width="160">
+                        <DataGridTextColumn Header="Описание" Binding="{Binding Description}" Width="200">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
                                     <Setter Property="ToolTip" Value="{Binding Description}"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                                    <Setter Property="Padding" Value="4,0,4,0"/>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
@@ -106,7 +129,8 @@
                         <DataGridTemplateColumn Header="Изображение" Width="100">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Image Source="{Binding Image}" Width="60" Height="60" Stretch="UniformToFill"/>
+                                    <Image Source="{Binding Image}" Width="60" Height="60" Stretch="UniformToFill"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -117,11 +141,11 @@
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                         <Button Width="36" Height="36" Margin="4"
-                                                Click="EditDish_Click" Tag="{Binding}">
+                            Click="EditDish_Click" Tag="{Binding}">
                                             <TextBlock Text="✏" FontSize="16"/>
                                         </Button>
                                         <Button Width="36" Height="36" Margin="4"
-                                                Click="DeleteDish_Click" Tag="{Binding}">
+                            Click="DeleteDish_Click" Tag="{Binding}">
                                             <TextBlock Text="🗑" FontSize="16"/>
                                         </Button>
                                     </StackPanel>
@@ -129,6 +153,8 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
                     </DataGrid.Columns>
+
+
                 </DataGrid>
             </Border>
         </Grid>

@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 using CafeAutomation.DB;
-using CafeAutomation.Views; 
+using CafeAutomation.Views;
 using CafeAutomation.Models;
 using System.Windows.Input;
 

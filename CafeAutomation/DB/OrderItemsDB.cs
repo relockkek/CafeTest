@@ -47,6 +47,11 @@ internal class OrderItemsDB : BaseDB
         return result;
     }
 
+    public async Task<bool> InsertAsync(OrderItems item)
+    {
+        return await Task.Run(() => Insert(item));
+    }
+
     public async Task<List<OrderItems>> SelectAllAsync()
     {
         List<OrderItems> list = new List<OrderItems>();
@@ -115,6 +120,7 @@ internal class OrderItemsDB : BaseDB
 
         return result;
     }
+
     public async Task<List<(string Name, int Quantity, decimal Total)>> GetOrderDetailsAsync(int orderId)
     {
         List<(string Name, int Quantity, decimal Total)> items = new();
@@ -122,11 +128,11 @@ internal class OrderItemsDB : BaseDB
         if (!db.OpenConnection()) return items;
 
         string query = @"
-        SELECT d.Name, oi.Amount, oi.PriceAtOrderTime
-        FROM OrderItems oi
-        JOIN Dishes d ON d.ID = oi.DishID
-        WHERE oi.OrderID = @orderId;
-    ";
+            SELECT d.Name, oi.Amount, oi.PriceAtOrderTime
+            FROM OrderItems oi
+            JOIN Dishes d ON d.ID = oi.DishID
+            WHERE oi.OrderID = @orderId;
+        ";
 
         using var cmd = db.CreateCommand(query);
         cmd.Parameters.AddWithValue("@orderId", orderId);

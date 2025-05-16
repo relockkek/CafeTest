@@ -48,6 +48,11 @@ internal class OrdersDB : BaseDB
         return result;
     }
 
+    public async Task<bool> InsertAsync(Orders order)
+    {
+        return await Task.Run(() => Insert(order));
+    }
+
     public async Task<List<Orders>> SelectAllAsync()
     {
         List<Orders> list = new List<Orders>();

@@ -15,8 +15,6 @@ namespace CafeAutomation.ViewModels
         public ObservableCollection<Dishes> AvailableDishes { get; set; } = new();
         public ObservableCollection<DishForOrder> SelectedDishes { get; set; } = new();
 
-        private List<Dishes> allDishes;
-
         public DishForOrder SelectedDishForOrder { get; set; }
         public Dishes SelectedAvailableDish { get; set; }
 
@@ -28,7 +26,7 @@ namespace CafeAutomation.ViewModels
             set
             {
                 selectedCategory = value;
-                _ = FilterDishesAsync();
+                _ = LoadAvailableDishesAsync();
                 Signal();
             }
         }
@@ -50,17 +48,20 @@ namespace CafeAutomation.ViewModels
 
         public CreateOrderVM()
         {
-            _ = LoadDishesAsync();
+            _ = LoadCategoriesAsync();
 
-            AddToOrder = new CommandMvvm((_) =>
+            AddToOrder = new CommandMvvm(async (_) =>
             {
                 if (SelectedAvailableDish == null) return;
 
-                var existing = SelectedDishes.FirstOrDefault(x => x.Dish.ID == SelectedAvailableDish.ID);
+                var fullDish = await DishesDB.GetDb().GetByIdAsync(SelectedAvailableDish.ID);
+                if (fullDish == null) return;
+
+                var existing = SelectedDishes.FirstOrDefault(x => x.Dish.ID == fullDish.ID);
                 if (existing != null)
                     existing.Quantity++;
                 else
-                    SelectedDishes.Add(new DishForOrder { Dish = SelectedAvailableDish, Quantity = 1 });
+                    SelectedDishes.Add(new DishForOrder { Dish = fullDish, Quantity = 1 });
 
                 Signal(nameof(OrderTotal));
             });
@@ -91,52 +92,52 @@ namespace CafeAutomation.ViewModels
                     TotalAmount = OrderTotal
                 };
 
-                bool inserted = await Task.Run(() => OrdersDB.GetDb().Insert(order));
-
-                if (inserted)
+                bool inserted = await OrdersDB.GetDb().InsertAsync(order);
+                if (!inserted)
                 {
-                    foreach (var dish in SelectedDishes)
-                    {
-                        await Task.Run(() => OrderItemsDB.GetDb().Insert(new OrderItems
-                        {
-                            OrderID = order.ID,
-                            DishID = dish.Dish.ID,
-                            Amount = dish.Quantity,
-                            PriceAtOrderTime = dish.Dish.Price
-                        }));
-                    }
-
-                    // Обновляем статус стола
-                    var tables = await TablesDB.GetDb().SelectAllAsync();
-                    var tableToUpdate = tables.FirstOrDefault(t => t.TableNumber == SelectedTable);
-                    if (tableToUpdate != null)
-                    {
-                        tableToUpdate.IsActive = true;
-                        await TablesDB.GetDb().UpdateAsync(tableToUpdate);
-                    }
-
-                    // Окно оплаты
-                    string orderInfo = string.Join("\n", SelectedDishes.Select(d => $"{d.Dish.Name} x {d.Quantity} → {d.Total:C}")) +
-                                       $"\n\nИтого: {OrderTotal:C}";
-
-                    var dialog = new PaymentDialog(orderInfo);
-                    if (dialog.ShowDialog() == true && dialog.PaymentConfirmed)
-                    {
-                        MessageBox.Show($"Оплата прошла: {dialog.SelectedMethod}");
-                    }
-                    else
-                    {
-                        MessageBox.Show("Оплата отменена.");
-                    }
-
-                    MessageBox.Show($"Заказ оформлен!\nСтол: {SelectedTable}\nДетали: {OrderNotes}");
-
-                    // Очистка формы
-                    ClearForm();
-                    Signal(nameof(OrderNotes));
-                    Signal(nameof(SelectedDishes));
-                    Signal(nameof(OrderTotal));
+                    MessageBox.Show("Не удалось создать заказ.");
+                    return;
                 }
+
+                // ✅ Оптимизированная вставка всех позиций заказа
+                var insertTasks = SelectedDishes.Select(dish =>
+                    OrderItemsDB.GetDb().InsertAsync(new OrderItems
+                    {
+                        OrderID = order.ID,
+                        DishID = dish.Dish.ID,
+                        Amount = dish.Quantity,
+                        PriceAtOrderTime = dish.Dish.Price
+                    })
+                );
+                await Task.WhenAll(insertTasks);
+
+                var tables = await TablesDB.GetDb().SelectAllAsync();
+                var tableToUpdate = tables.FirstOrDefault(t => t.TableNumber == SelectedTable);
+                if (tableToUpdate != null)
+                {
+                    tableToUpdate.IsActive = true;
+                    await TablesDB.GetDb().UpdateAsync(tableToUpdate);
+                }
+
+                string orderInfo = string.Join("\n", SelectedDishes.Select(d => $"{d.Dish.Name} x {d.Quantity} → {d.Total:C}")) +
+                                   $"\n\nИтого: {OrderTotal:C}";
+
+                var dialog = new PaymentDialog(orderInfo);
+                if (dialog.ShowDialog() == true && dialog.PaymentConfirmed)
+                {
+                    MessageBox.Show($"Оплата прошла: {dialog.SelectedMethod}");
+                }
+                else
+                {
+                    MessageBox.Show("Оплата отменена.");
+                }
+
+                MessageBox.Show($"Заказ оформлен!\nСтол: {SelectedTable}\nДетали: {OrderNotes}");
+
+                ClearForm();
+                Signal(nameof(OrderNotes));
+                Signal(nameof(SelectedDishes));
+                Signal(nameof(OrderTotal));
             });
 
             IncreaseQuantity = new CommandMvvm((obj) =>
@@ -161,21 +162,19 @@ namespace CafeAutomation.ViewModels
             });
         }
 
-        private async Task LoadDishesAsync()
+        private async Task LoadCategoriesAsync()
         {
-            var all = await DishesDB.GetDb().SelectAllAsync();
-            allDishes = all.Where(d => d.IsAvailable).ToList();
-            Categories = new ObservableCollection<string>(allDishes.Select(d => d.Category).Distinct());
+            var categories = await DishesDB.GetDb().GetDistinctCategoriesAsync();
+            Categories = new ObservableCollection<string>(categories);
             SelectedCategory = Categories.FirstOrDefault();
             Signal(nameof(Categories));
         }
 
-        private async Task FilterDishesAsync()
+        private async Task LoadAvailableDishesAsync()
         {
             if (string.IsNullOrEmpty(SelectedCategory)) return;
-            var filtered = await Task.Run(() =>
-                allDishes.Where(d => d.Category == SelectedCategory).ToList());
 
+            var filtered = await DishesDB.GetDb().SelectByCategoryLightAsync(SelectedCategory);
             AvailableDishes = new ObservableCollection<Dishes>(filtered);
             Signal(nameof(AvailableDishes));
         }

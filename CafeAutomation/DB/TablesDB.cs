@@ -47,6 +47,11 @@ internal class TablesDB : BaseDB
         return result;
     }
 
+    public async Task<bool> InsertAsync(Tables table)
+    {
+        return await Task.Run(() => Insert(table));
+    }
+
     public async Task<List<Tables>> SelectAllAsync()
     {
         List<Tables> list = new List<Tables>();
@@ -142,4 +147,39 @@ internal class TablesDB : BaseDB
 
         return result;
     }
+    public async Task<Tables?> GetByNumberAsync(int number)
+    {
+        Tables? table = null;
+
+        using var db = DbConnection.GetDbConnection();
+        if (!db.OpenConnection()) return null;
+
+        string query = "SELECT ID, TableNumber, Capacity, Zone, IsActive FROM Tables WHERE TableNumber = @number";
+
+        using var cmd = db.CreateCommand(query);
+        cmd.Parameters.AddWithValue("@number", number);
+
+        try
+        {
+            var reader = await Task.Run(() => cmd.ExecuteReader());
+            if (reader.Read())
+            {
+                table = new Tables
+                {
+                    ID = reader.GetInt32(0),
+                    TableNumber = reader.GetInt32(1),
+                    Capacity = reader.GetInt32(2),
+                    Zone = reader.GetString(3),
+                    IsActive = reader.GetBoolean(4)
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Ошибка при получении стола: " + ex.Message);
+        }
+
+        return table;
+    }
+
 }

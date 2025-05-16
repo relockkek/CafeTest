@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading.Tasks;
 using CafeAutomation.Models;
 using CafeAutomation.DB;
@@ -42,14 +41,13 @@ namespace CafeAutomation.ViewModels
         {
             Categories = new ObservableCollection<CategoryItem>
             {
-                new CategoryItem { Name = "Горячие блюда", ImagePath = "pack://application:,,,/Images/hot.png" },
-                new CategoryItem { Name = "Напитки", ImagePath = "pack://application:,,,/Images/drinks.png" },
-                new CategoryItem { Name = "Закуски", ImagePath = "pack://application:,,,/Images/snacks.png" },
-                new CategoryItem { Name = "Десерты", ImagePath = "pack://application:,,,/Images/dessert.png" },
-                new CategoryItem { Name = "Салаты", ImagePath = "pack://application:,,,/Images/salad.png" },
-                new CategoryItem { Name = "Завтраки", ImagePath = "pack://application:,,,/Images/breakfast.png" }
+                new CategoryItem { Name = "Горячие блюда", ImagePath = "pack://application:,,,/Images/hot.jpg" },
+                new CategoryItem { Name = "Напитки", ImagePath = "pack://application:,,,/Images/drinks.jpg" },
+                new CategoryItem { Name = "Закуски", ImagePath = "pack://application:,,,/Images/snacks.jpg" },
+                new CategoryItem { Name = "Десерты", ImagePath = "pack://application:,,,/Images/dessert.jpg" },
+                new CategoryItem { Name = "Салаты", ImagePath = "pack://application:,,,/Images/salad.jpg" },
+                new CategoryItem { Name = "Завтраки", ImagePath = "pack://application:,,,/Images/breakfast.jpg" }
             };
-            Signal(nameof(Categories));
         }
 
         public DishesMVVM(string category) : this()
@@ -67,14 +65,12 @@ namespace CafeAutomation.ViewModels
         private async Task LoadDishesAsync()
         {
             IsLoading = true;
-            await Task.Delay(1);
 
-            var all = await DishesDB.GetDb().SelectAllAsync();
-            var filtered = selectedCategory != null
-                ? all.Where(d => d.Category == selectedCategory && d.IsAvailable)
-                : all;
+            Dishes.Clear();
+            var filtered = await DishesDB.GetDb().SelectByCategoryAsync(selectedCategory);
+            foreach (var dish in filtered)
+                Dishes.Add(dish);
 
-            Dishes = new ObservableCollection<Dishes>(filtered);
             IsLoading = false;
         }
     }

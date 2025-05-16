@@ -9,7 +9,37 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Images\breakfast.jpg" />
+	  <None Remove="Images\dessert.jpg" />
+	  <None Remove="Images\drinks.jpg" />
+	  <None Remove="Images\hot.jpg" />
+	  <None Remove="Images\salad.jpg" />
+	  <None Remove="Images\snacks.jpg" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="MySqlConnector" Version="2.4.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Images\breakfast.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\dessert.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\drinks.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\hot.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\salad.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Images\snacks.jpg">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
 	</ItemGroup>
 
 </Project>
