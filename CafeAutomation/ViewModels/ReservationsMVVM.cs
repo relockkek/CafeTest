@@ -29,13 +29,21 @@ namespace CafeAutomation.ViewModels
                     CustomerName = "",
                     CustomerPhone = "",
                     GuestsCount = 1,
-                    ReservationDate = DateTime.Now,
+                    ReservationDate = DateTime.Today,
+                    ReservationTime = "12:00",
                     Status = "Свободен"
                 };
 
                 var dialog = new EditReservationDialog(res);
                 if (dialog.ShowDialog() == true)
                 {
+                    if (!TimeSpan.TryParse(res.ReservationTime, out var time))
+                    {
+                        MessageBox.Show("Введите корректное время в формате ЧЧ:ММ");
+                        return;
+                    }
+                    res.ReservationDate = res.ReservationDate.Date + time;
+
                     if (ReservationsDB.GetDb().Insert(res))
                     {
                         await LoadDataAsync();
@@ -55,12 +63,20 @@ namespace CafeAutomation.ViewModels
                     CustomerPhone = SelectedReservation.CustomerPhone,
                     GuestsCount = SelectedReservation.GuestsCount,
                     ReservationDate = SelectedReservation.ReservationDate,
+                    ReservationTime = SelectedReservation.ReservationTime,
                     Status = SelectedReservation.Status
                 };
 
                 var dialog = new EditReservationDialog(copy);
                 if (dialog.ShowDialog() == true)
                 {
+                    if (!TimeSpan.TryParse(copy.ReservationTime, out var time))
+                    {
+                        MessageBox.Show("Введите корректное время в формате ЧЧ:ММ");
+                        return;
+                    }
+                    copy.ReservationDate = copy.ReservationDate.Date + time;
+
                     await ReservationsDB.GetDb().UpdateAsync(copy);
                     await LoadDataAsync();
                 }

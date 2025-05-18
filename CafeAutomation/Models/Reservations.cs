@@ -14,6 +14,8 @@ namespace CafeAutomation.Models
         public string CustomerPhone { get; set; }
         public int GuestsCount { get; set; }
         public DateTime ReservationDate { get; set; }   
-        public string Status { get; set; } 
+        public string Status { get; set; }
+        public string ReservationTime { get; set; } = "12:00";
+
     }
 }

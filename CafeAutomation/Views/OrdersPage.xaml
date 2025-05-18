@@ -39,7 +39,6 @@
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,20,0,0">
                 <Button Content="Добавить" Command="{Binding AddOrder}" Width="100" Height="36" Margin="0 0 10 0"/>
-                <Button Content="Обновить" Command="{Binding UpdateOrder}" Width="100" Height="36" Margin="0 0 10 0"/>
                 <Button Content="Удалить" Command="{Binding RemoveOrder}" Width="100" Height="36"/>
             </StackPanel>
 
