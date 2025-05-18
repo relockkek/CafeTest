@@ -31,8 +31,7 @@ namespace CafeAutomation.ViewModels
             }
         }
 
-        public ObservableCollection<int> TableNumbers { get; set; } =
-            new ObservableCollection<int>(Enumerable.Range(1, 20));
+        public ObservableCollection<int> TableNumbers { get; set; } = new();
         public int SelectedTable { get; set; } = 1;
 
         public string OrderNotes { get; set; } = "";
@@ -49,6 +48,7 @@ namespace CafeAutomation.ViewModels
         public CreateOrderVM()
         {
             _ = LoadCategoriesAsync();
+            _ = LoadFreeTablesAsync();
 
             AddToOrder = new CommandMvvm(async (_) =>
             {
@@ -99,7 +99,6 @@ namespace CafeAutomation.ViewModels
                     return;
                 }
 
-                // ✅ Оптимизированная вставка всех позиций заказа
                 var insertTasks = SelectedDishes.Select(dish =>
                     OrderItemsDB.GetDb().InsertAsync(new OrderItems
                     {
@@ -110,14 +109,6 @@ namespace CafeAutomation.ViewModels
                     })
                 );
                 await Task.WhenAll(insertTasks);
-
-                var tables = await TablesDB.GetDb().SelectAllAsync();
-                var tableToUpdate = tables.FirstOrDefault(t => t.TableNumber == SelectedTable);
-                if (tableToUpdate != null)
-                {
-                    tableToUpdate.IsActive = true;
-                    await TablesDB.GetDb().UpdateAsync(tableToUpdate);
-                }
 
                 string orderInfo = string.Join("\n", SelectedDishes.Select(d => $"{d.Dish.Name} x {d.Quantity} → {d.Total:C}")) +
                                    $"\n\nИтого: {OrderTotal:C}";
@@ -134,7 +125,7 @@ namespace CafeAutomation.ViewModels
 
                 MessageBox.Show($"Заказ оформлен!\nСтол: {SelectedTable}\nДетали: {OrderNotes}");
 
-                ClearForm();
+                await ClearForm();
                 Signal(nameof(OrderNotes));
                 Signal(nameof(SelectedDishes));
                 Signal(nameof(OrderTotal));
@@ -179,11 +170,32 @@ namespace CafeAutomation.ViewModels
             Signal(nameof(AvailableDishes));
         }
 
-        public void ClearForm()
+        private async Task LoadFreeTablesAsync()
+        {
+            var allTables = Enumerable.Range(1, 20).ToList();
+
+            var reservations = await ReservationsDB.GetDb().SelectAllAsync();
+            var reservedTables = reservations
+                .Where(r => !string.IsNullOrEmpty(r.Status) && r.Status.ToLower() == "занят") // ← изменено с "активна"
+                .Select(r => r.TableID)
+                .Distinct()
+                .ToList();
+
+            var freeTables = allTables.Except(reservedTables).ToList();
+
+            TableNumbers = new ObservableCollection<int>(freeTables);
+            SelectedTable = TableNumbers.FirstOrDefault();
+
+            Signal(nameof(TableNumbers));
+            Signal(nameof(SelectedTable));
+        }
+
+
+        public async Task ClearForm()
         {
             SelectedDishes.Clear();
             OrderNotes = string.Empty;
-            SelectedTable = TableNumbers.FirstOrDefault();
+            await LoadFreeTablesAsync();
             SelectedAvailableDish = null;
         }
     }

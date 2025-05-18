@@ -12,41 +12,5 @@ namespace CafeAutomation.Views
         {
             InitializeComponent();
         }
-
-        private async void AddReservation_Click(object sender, RoutedEventArgs e)
-        {
-            var res = new Reservations();
-            var dialog = new EditReservationDialog(res);
-            if (dialog.ShowDialog() == true)
-            {
-                if (ReservationsDB.GetDb().Insert(dialog.Reservation))
-                {
-                    await ((ReservationsMVVM)DataContext).LoadDataAsync();
-                }
-            }
-        }
-
-        private async void EditReservation_Click(object sender, RoutedEventArgs e)
-        {
-            if (((ReservationsMVVM)DataContext).SelectedReservation is Reservations selected)
-            {
-                var dialog = new EditReservationDialog(new Reservations
-                {
-                    ID = selected.ID,
-                    TableID = selected.TableID,
-                    CustomerName = selected.CustomerName,
-                    CustomerPhone = selected.CustomerPhone,
-                    GuestsCount = selected.GuestsCount,
-                    ReservationDate = selected.ReservationDate,
-                    Status = selected.Status
-                });
-
-                if (dialog.ShowDialog() == true)
-                {
-                    await ReservationsDB.GetDb().UpdateAsync(dialog.Reservation);
-                    await ((ReservationsMVVM)DataContext).LoadDataAsync();
-                }
-            }
-        }
     }
 }

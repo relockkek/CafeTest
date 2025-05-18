@@ -20,10 +20,10 @@ namespace CafeAutomation.Views
         public CreateOrderDialog()
         {
             InitializeComponent();
-
             Resources["ImageFromBytes"] = new CafeAutomation.Converters.ByteArrayToImageConverter();
 
-            DataContext = new CreateOrderVM();
+            var vm = new CreateOrderVM();
+            DataContext = vm;
         }
     }
 }

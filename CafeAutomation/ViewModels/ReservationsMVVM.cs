@@ -1,36 +1,17 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows;
-using CafeAutomation.DB;
-using CafeAutomation.ViewModels;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using System.Windows;
 using CafeAutomation.Models;
+using CafeAutomation.DB;
+using CafeAutomation.Views;
 
 namespace CafeAutomation.ViewModels
 {
-    internal class ReservationsMVVM : BaseVM
+    public class ReservationsMVVM : BaseVM
     {
-        private Reservations selectedReservation;
-        private ObservableCollection<Reservations> reservations = new();
-
-        public ObservableCollection<Reservations> Reservations
-        {
-            get => reservations;
-            set
-            {
-                reservations = value;
-                Signal();
-            }
-        }
-
-        public Reservations SelectedReservation
-        {
-            get => selectedReservation;
-            set
-            {
-                selectedReservation = value;
-                Signal();
-            }
-        }
+        public ObservableCollection<Reservations> Reservations { get; set; } = new();
+        public Reservations SelectedReservation { get; set; }
 
         public CommandMvvm AddReservation { get; }
         public CommandMvvm UpdateReservation { get; }
@@ -38,49 +19,71 @@ namespace CafeAutomation.ViewModels
 
         public ReservationsMVVM()
         {
-            LoadDataAsync();
+            _ = LoadDataAsync();
 
-            AddReservation = new CommandMvvm((_) =>
+            AddReservation = new CommandMvvm(async (_) =>
             {
                 var res = new Reservations
                 {
                     TableID = 1,
-                    CustomerName = "Гость",
-                    GuestsCount = 2,
+                    CustomerName = "",
+                    CustomerPhone = "",
+                    GuestsCount = 1,
                     ReservationDate = DateTime.Now,
-                    Status = "Активна"
+                    Status = "Свободен"
                 };
 
-                if (ReservationsDB.GetDb().Insert(res))
+                var dialog = new EditReservationDialog(res);
+                if (dialog.ShowDialog() == true)
                 {
-                    LoadDataAsync();
-                    SelectedReservation = res;
+                    if (ReservationsDB.GetDb().Insert(res))
+                    {
+                        await LoadDataAsync();
+                    }
                 }
-            }, (_) => true);
+            });
 
             UpdateReservation = new CommandMvvm(async (_) =>
             {
-                if (SelectedReservation != null && await ReservationsDB.GetDb().UpdateAsync(SelectedReservation))
+                if (SelectedReservation == null) return;
+
+                var copy = new Reservations
                 {
-                    MessageBox.Show("Обновлено");
+                    ID = SelectedReservation.ID,
+                    TableID = SelectedReservation.TableID,
+                    CustomerName = SelectedReservation.CustomerName,
+                    CustomerPhone = SelectedReservation.CustomerPhone,
+                    GuestsCount = SelectedReservation.GuestsCount,
+                    ReservationDate = SelectedReservation.ReservationDate,
+                    Status = SelectedReservation.Status
+                };
+
+                var dialog = new EditReservationDialog(copy);
+                if (dialog.ShowDialog() == true)
+                {
+                    await ReservationsDB.GetDb().UpdateAsync(copy);
                     await LoadDataAsync();
                 }
-            }, (_) => SelectedReservation != null);
+            });
 
             RemoveReservation = new CommandMvvm(async (_) =>
             {
-                if (SelectedReservation != null && await ReservationsDB.GetDb().DeleteAsync(SelectedReservation))
+                if (SelectedReservation == null) return;
+
+                var result = MessageBox.Show("Удалить выбранное бронирование?", "Подтверждение", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
                 {
-                    MessageBox.Show("Удалено");
+                    await ReservationsDB.GetDb().DeleteAsync(SelectedReservation);
                     await LoadDataAsync();
                 }
-            }, (_) => SelectedReservation != null);
+            });
         }
 
         public async Task LoadDataAsync()
         {
             var data = await ReservationsDB.GetDb().SelectAllAsync();
             Reservations = new ObservableCollection<Reservations>(data);
+            Signal(nameof(Reservations));
         }
     }
 }

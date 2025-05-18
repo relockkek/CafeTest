@@ -13,7 +13,6 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Основной ввод -->
         <StackPanel VerticalAlignment="Top" Margin="0,0,0,10">
             <TextBlock Text="Имя клиента" FontWeight="SemiBold"/>
             <TextBox Text="{Binding CustomerName}" Margin="0 5 0 15" FontSize="14" Height="30"/>
@@ -28,7 +27,7 @@
             <TextBox Text="{Binding TableID}" Margin="0 5 0 15" FontSize="14" Height="30"/>
 
             <TextBlock Text="Дата и время" FontWeight="SemiBold"/>
-            <DatePicker SelectedDate="{Binding ReservationDate}"
+            <DatePicker SelectedDate="{Binding ReservationDate, Mode=TwoWay}" 
                         Margin="0 5 0 15"
                         FontSize="14" Height="30"/>
 
@@ -41,11 +40,8 @@
                 <ComboBoxItem Content="Свободен" />
                 <ComboBoxItem Content="Занят" />
             </ComboBox>
-
-            <!-- Здесь можно будет вставить доп. поля или метки -->
         </StackPanel>
 
-        <!-- Кнопки -->
         <StackPanel Grid.Row="1"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"

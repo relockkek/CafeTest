@@ -5,7 +5,7 @@ namespace CafeAutomation.Views
 {
     public partial class EditReservationDialog : Window
     {
-        public Reservations Reservation { get; private set; }
+        public Reservations Reservation { get; private set; } // ✅ вот это нужно!
 
         public EditReservationDialog(Reservations reservation)
         {

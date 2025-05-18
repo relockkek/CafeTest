@@ -22,8 +22,8 @@
                    HorizontalAlignment="Center"
                    Margin="0,0,0,20"/>
 
-        <!-- Таблица бронирований -->
-        <Border Grid.Row="1" BorderThickness="1" BorderBrush="#DDD" CornerRadius="8" Padding="10">
+        <!-- Таблица -->
+        <Border Grid.Row="1" BorderBrush="#DDD" BorderThickness="1" CornerRadius="8" Padding="10">
             <DataGrid ItemsSource="{Binding Reservations}"
                       SelectedItem="{Binding SelectedReservation}"
                       AutoGenerateColumns="False"
@@ -36,7 +36,6 @@
                       FontSize="14"
                       ColumnHeaderHeight="40"
                       RowHeight="40"
-                      Margin="0"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch">
 
@@ -45,14 +44,14 @@
                     <DataGridTextColumn Header="Стол" Binding="{Binding TableID}" Width="80"/>
                     <DataGridTextColumn Header="Имя клиента" Binding="{Binding CustomerName}" Width="*"/>
                     <DataGridTextColumn Header="Телефон" Binding="{Binding CustomerPhone}" Width="*"/>
-                    <DataGridTextColumn Header="Гостей" Binding="{Binding GuestsCount}" Width="80"/>
-                    <DataGridTextColumn Header="Дата и время" Binding="{Binding ReservationDate, StringFormat={}{0:dd.MM.yyyy HH:mm}}" Width="180"/>
-                    <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="120"/>
+                    <DataGridTextColumn Header="Гостей" Binding="{Binding GuestsCount}" Width="100"/>
+                    <DataGridTextColumn Header="Дата и время" Binding="{Binding ReservationDate, StringFormat=dd.MM.yyyy HH:mm}" Width="200"/>
+                    <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="150"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Border>
 
-        <!-- Кнопки управления -->
+        <!-- Кнопки -->
         <StackPanel Grid.Row="2"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
@@ -60,11 +59,11 @@
             <Button Content="➕ Добавить"
                     Width="120" Height="40" Margin="5"
                     FontWeight="SemiBold"
-                    Click="AddReservation_Click"/>
+                    Command="{Binding AddReservation}"/>
             <Button Content="✏ Изменить"
                     Width="120" Height="40" Margin="5"
                     FontWeight="SemiBold"
-                    Click="EditReservation_Click"/>
+                    Command="{Binding UpdateReservation}"/>
             <Button Content="🗑 Удалить"
                     Width="120" Height="40" Margin="5"
                     FontWeight="SemiBold"
