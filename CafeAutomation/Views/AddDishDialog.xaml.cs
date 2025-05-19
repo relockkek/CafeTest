@@ -49,10 +49,18 @@ namespace CafeAutomation.Views
 
             if (dialog.ShowDialog() == true)
             {
-                var resized = ResizeAndCompressImage(dialog.FileName, 200, 200, 0.7); // 70% качество
-                ResultDish.ImageData = resized;
+                var resized = ResizeAndCompressImage(dialog.FileName, 200, 200, 0.7);
+                selectedImageBytes = resized; 
+
+                var image = new BitmapImage();
+                image.BeginInit();
+                image.StreamSource = new MemoryStream(resized);
+                image.CacheOption = BitmapCacheOption.OnLoad;
+                image.EndInit();
+                PreviewImage.Source = image;
             }
         }
+
         private byte[] ResizeAndCompressImage(string filePath, int maxWidth, int maxHeight, double quality)
         {
             BitmapImage original = new BitmapImage();

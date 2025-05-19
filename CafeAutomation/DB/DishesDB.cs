@@ -93,7 +93,7 @@ namespace CafeAutomation.DB
             {
                 if (!db.OpenConnection()) return result;
 
-                string query = "DELETE FROM Dishes WHERE ID=@id";
+                string query = "UPDATE Dishes SET IsAvailable = 0 WHERE ID = @id";
                 using (var cmd = db.CreateCommand(query))
                 {
                     cmd.Parameters.AddWithValue("@id", dish.ID);
@@ -105,13 +105,14 @@ namespace CafeAutomation.DB
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Ошибка удаления блюда: " + ex.Message);
+                        MessageBox.Show("Ошибка при скрытии блюда: " + ex.Message);
                     }
                 }
             }
 
             return result;
         }
+
 
         public async Task<List<Dishes>> SelectAllAsync()
         {
