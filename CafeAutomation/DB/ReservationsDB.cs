@@ -9,7 +9,7 @@ namespace CafeAutomation.DB
 {
     internal class ReservationsDB : BaseDB
     {
-        // Singleton
+        
         private static ReservationsDB instance;
         public static ReservationsDB GetDb() => instance ??= new ReservationsDB();
 

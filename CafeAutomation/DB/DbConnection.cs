@@ -63,19 +63,15 @@ public class DbConnection : IDisposable
         return new MySqlCommand(sql, _connection);
     }
 
-    // Теперь всегда создаётся новое соединение
     public static DbConnection GetDbConnection()
     {
         return new DbConnection();
     }
 
-    // Приватный конструктор — чтобы нельзя было создать без метода GetDbConnection
     private DbConnection()
     {
         Config();
     }
-
-    // Реализация IDisposable
     public void Dispose()
     {
         CloseConnection();

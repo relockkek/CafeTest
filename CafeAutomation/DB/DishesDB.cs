@@ -196,7 +196,7 @@ namespace CafeAutomation.DB
                         Category = reader.IsDBNull(3) ? "" : reader.GetString(3),
                         Description = reader.IsDBNull(4) ? "" : reader.GetString(4),
                         IsAvailable = reader.GetBoolean(5),
-                        ImageData = null // <--- Убираем картинку
+                        ImageData = null 
                     });
                 }
 
